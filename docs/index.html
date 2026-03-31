@@ -1,0 +1,365 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AccurateSL</title>
+<link href="./static/style.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons/css/academicons.min.css">
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<!-- <link rel="stylesheet" href="./static/fontawesome.all.min.css"> -->
+<script type="text/javascript" src="./static/jquery.mlens-1.0.min.js"></script> 
+<script type="text/javascript" src="./static/jquery.js"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<style>
+  table, th, td {
+  /* border: 3px solid black; */
+  border: none;
+  border-collapse: collapse;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  .textredtab {
+    color: red;
+  }
+  .textbluetab {
+    color: blue;
+  }
+}
+tr {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+tr:hover {
+  background-color: #dfdfdf;
+}
+caption {
+  /* font-size: 1.2em;
+  font-weight: bold; */
+  margin-bottom: 10px;
+}
+figcaption {
+  /* font-size: 1.2em;
+  font-weight: bold; */
+  margin-top: 10px;
+}
+/* tr:nth-child(4){background-color: #eee;}
+tr:nth-child(5){background-color: #eee;}
+tr:nth-child(6){background-color: #eee;} */
+td:nth-child(1){text-align: left;}
+
+table .col-divider {
+  border-right: 2px solid black;
+}
+
+</style>
+</head>
+
+<body>
+<div class="content">
+  <h1><span style="font-weight: bold;">Accurate Split Learning on Noisy Signals</span></h1>
+  <h1><span style="font-weight: bold; font-size: 24px;">TMLR April, 2026</span></h1>
+  <p id="authors"><a href="https://https://scholar.google.com/citations?user=UhUecFUAAAAJ">Hang Xu</a><sup>1</sup> &nbsp;&nbsp;&nbsp;&nbsp; <a href="https://subhajitmaity.me">Subhajit Maity</a><sup>2</sup> &nbsp;&nbsp;&nbsp;&nbsp; <a href="https://sciences.ucf.edu/math/person/aritra-dutta">Aritra Dutta</a><sup>2</sup> &nbsp;&nbsp;&nbsp;&nbsp; <a href="https://sciences.ucf.edu/math/person/xin-li">Xin Li</a><sup>2</sup> &nbsp;&nbsp;&nbsp;&nbsp; <a href="https://kalnis.org">Panos Kalnis</a><sup>1</sup><br>
+    <br>
+  <!-- <span style="font-size: 24px"><sup>1</sup><a href="https://www.cs.ucf.edu" target="_blank">Department of Computer Science</a>, <a href="https://www.ucf.edu" target="_blank">University of Central Florida</a>   -->
+  <span><sup>1</sup><a href="https://www.kaust.edu.sa/en" target="_blank">King Abdullah University of Science and Technology</a>  
+  </span><br>
+  <!-- <span style="font-size: 24px"><sup>2</sup><a href="https://sciences.ucf.edu/math" target="_blank">Department of Mathematics</a>, <a href="https://www.ucf.edu" target="_blank">University of Central Florida</a> -->
+  <span><sup>2</sup><a href="https://www.ucf.edu" target="_blank">University of Central Florida</a>
+  </span></p>
+  <br>
+    <font size="+2">
+          <p style="text-align: center;">
+            <a href="https://openreview.net/forum?id=in1T4BlzG9" target="_blank">[<span><font size="+1"><i class="fas fa-file-pdf"></i></font></span>Paper]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="https://arxiv.org/abs/xxxx.xxxxx" target="_blank">[<span><font size="+1"><i class="ai ai-arxiv"></i></font></span>arXiv]</a> &nbsp;&nbsp;&nbsp;&nbsp;
+	    <!-- (<font color="#C70039">coming soon!</font>) --><a href="https://github.com/MaitySubhajit/AccurateSL" target="_blank">[<span><font size="+1"><i class="fab fa-github"></i></font></span>Code]</a>
+            <!-- &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="static/bibtex.txt" target="_blank">[BibTeX]</a> -->
+          </p>
+    </font>
+</div>
+<div class="content">
+  <h2 style="text-align:center;">Abstract</h2>
+  <p>Noise injection is applied in Split Learning to address privacy concerns about data leakage. Previous work protects Split Learning by adding noise to intermediate results during the forward pass. Unfortunately, noisy signals significantly degrade the accuracy of Split Learning training. This paper focuses on improving the training accuracy of Split Learning in the presence of noisy signals while protecting training data from reconstruction attacks. We propose two denoising techniques, namely scaling and random masking. Our theoretical results show that both of our denoising techniques accurately estimate the intermediate variables during the forward pass of Split Learning. Moreover, our experiments with deep neural networks demonstrate that the proposed denoising approaches allow Split Learning to tolerate high noise levels while achieving almost the same accuracy as the noise-free baseline. Interestingly, we show that, after applying our denoising techniques, the resulting network is more resilient to a state-of-the-art attack than the simple noise-injection approach.</p>
+</div>
+<div class="content">
+  <h2>Background</h2>
+  <figure>
+  <img class="summary-img" src="./static/images/intro-figure1_page-0001.jpg" style="width:100%;">
+  <figcaption>The trade-off between the security and training accuracy in noise-injected private
+  Split Learning. <em>(a)</em> General schematic representation of two-party split learning, where the neural network
+  is split between the client (owns the data) and server (owns the labels). Noise is injected into the client's
+  output to prevent private data leakage to the attacker. <em>(b)</em> Noise variance (\(\sigma\)) vs. Test accuracy in training a
+  split CNN model on the MNIST dataset. As the variance of the injected noise level (\(\sigma\)) increases, the test
+  accuracy drops. <em>(c)</em> Training data reconstruction by hijacking attack at different injected noise levels. The
+  reconstruction capacity decreases as the injected noise level is increased.
+  </figcaption>
+  </figure>
+</div>
+<div class="content">
+  <h2>Quantitative Results</h2>
+  <table class="border="3px solid black" border-collapse="collapse" style="width:100%">
+    <caption>
+        Scaling (\(\lambda\)) and Masking (\(p\)) at different noise level (\(\sigma\)). Results are
+        obtained by running the experiment 3 times with different random seeds. We record the best test accuracy
+        during the training instead of the final accuracy<br>
+    </caption>
+    <thead>
+      <tr style="border-top: 2px solid black; border-bottom: 2px solid black">
+        <th class="col-divider">Task</th>
+        <th class="col-divider">&sigma;</th>
+        <th class="col-divider">Best acc. (%)</th>
+        <th>&lambda;=0.1</th>
+        <th>&lambda;=0.2</th>
+        <th>&lambda;=0.4</th>
+        <th class="col-divider">&lambda;=0.6</th>
+        <th>p=0.1</th>
+        <th>p=0.2</th>
+        <th>p=0.4</th>
+        <th>p=0.6</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="4" class="col-divider">CNN-MNIST</td>
+        <td class="col-divider">0</td>
+        <td class="col-divider"><b>98.96 (&plusmn;0.13)</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="col-divider">-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.3</td>
+        <td class="col-divider">98.46 (&plusmn;0.07)</td>
+        <td>97.63 (&plusmn;0.27)</td>
+        <td>97.13 (&plusmn;0.23)</td>
+        <td>96.07 (&plusmn;0.10)</td>
+        <td class="col-divider">95.42 (&plusmn;0.17)</td>
+        <td>98.93 (&plusmn;0.14)</td>
+        <td>98.88 (&plusmn;0.19)</td>
+        <td>98.86 (&plusmn;0.11)</td>
+        <td>98.77 (&plusmn;0.09)</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.5</td>
+        <td class="col-divider">90.99 (&plusmn;0.38)</td>
+        <td>97.59 (&plusmn;0.20)</td>
+        <td>97.07 (&plusmn;0.63)</td>
+        <td>95.87 (&plusmn;0.09)</td>
+        <td class="col-divider">94.62 (&plusmn;0.94)</td>
+        <td>98.78 (&plusmn;0.15)</td>
+        <td>98.84 (&plusmn;0.16)</td>
+        <td>98.74 (&plusmn;0.30)</td>
+        <td>94.36 (&plusmn;1.13)</td>
+      </tr>
+      <tr style="border-bottom: 2px solid black">
+        <td class="col-divider">0.7</td>
+        <td class="col-divider"><b>81.85 (&plusmn;0.77)</b></td>
+        <td><b>97.11 (&plusmn;0.15)</b></td>
+        <td>96.30 (&plusmn;0.36)</td>
+        <td>90.95 (&plusmn;0.22)</td>
+        <td class="col-divider">88.88 (&plusmn;0.28)</td>
+        <td>98.31 (&plusmn;0.38)</td>
+        <td><b>98.62 (&plusmn;0.23)</b></td>
+        <td>96.67 (&plusmn;0.14)</td>
+        <td>90.51 (&plusmn;1.09)</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4" class="col-divider">ResNet20-CIFAR10</td>
+        <td class="col-divider">0</td>
+        <td class="col-divider"><b>91.76 (&plusmn;0.28)</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="col-divider">-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.3</td>
+        <td class="col-divider">90.98 (&plusmn;0.23)</td>
+        <td>89.15 (&plusmn;0.51)</td>
+        <td>90.13 (&plusmn;0.95)</td>
+        <td>90.67 (&plusmn;0.49)</td>
+        <td class="col-divider">90.84 (&plusmn;0.43)</td>
+        <td>88.69 (&plusmn;0.80)</td>
+        <td>89.54 (&plusmn;0.57)</td>
+        <td>90.30 (&plusmn;0.26)</td>
+        <td>90.15 (&plusmn;0.31)</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.5</td>
+        <td class="col-divider">89.72 (&plusmn;0.49)</td>
+        <td>89.93 (&plusmn;0.52)</td>
+        <td>90.50 (&plusmn;0.74)</td>
+        <td>90.33 (&plusmn;0.72)</td>
+        <td class="col-divider">89.97 (&plusmn;0.62)</td>
+        <td>88.21 (&plusmn;0.50)</td>
+        <td>89.55 (&plusmn;0.73)</td>
+        <td>89.98 (&plusmn;0.98)</td>
+        <td>89.65 (&plusmn;1.10)</td>
+      </tr>
+      <tr style="border-bottom: 2px solid black">
+        <td class="col-divider">0.7</td>
+        <td class="col-divider"><b>82.03 (&plusmn;0.76)</b></td>
+        <td><b>88.88 (&plusmn;0.74)</b></td>
+        <td>87.95 (&plusmn;0.13)</td>
+        <td>87.21 (&plusmn;0.79)</td>
+        <td class="col-divider">85.80 (&plusmn;0.88)</td>
+        <td>88.45 (&plusmn;0.90)</td>
+        <td><b>89.15 (&plusmn;1.16)</b></td>
+        <td>88.52 (&plusmn;1.29)</td>
+        <td>87.60 (&plusmn;1.41)</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4" class="col-divider">MLP-IMDB</td>
+        <td class="col-divider">0</td>
+        <td class="col-divider"><b>85.53 (&plusmn;0.18)</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="col-divider">-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.3</td>
+        <td class="col-divider">85.42 (&plusmn;0.30)</td>
+        <td>85.85 (&plusmn;0.63)</td>
+        <td>85.49 (&plusmn;0.17)</td>
+        <td>84.72 (&plusmn;0.58)</td>
+        <td class="col-divider">85.47 (&plusmn;0.03)</td>
+        <td>85.49 (&plusmn;0.33)</td>
+        <td>85.54 (&plusmn;0.55)</td>
+        <td>85.64 (&plusmn;0.51)</td>
+        <td>85.21 (&plusmn;0.74)</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.5</td>
+        <td class="col-divider">84.85 (&plusmn;0.63)</td>
+        <td>85.44 (&plusmn;0.68)</td>
+        <td>85.35 (&plusmn;0.84)</td>
+        <td>84.06 (&plusmn;0.58)</td>
+        <td class="col-divider">84.55 (&plusmn;0.72)</td>
+        <td>85.55 (&plusmn;0.69)</td>
+        <td>86.00 (&plusmn;0.36)</td>
+        <td>85.18 (&plusmn;0.62)</td>
+        <td>85.92 (&plusmn;1.22)</td>
+      </tr>
+      <tr style="border-bottom: 2px solid black">
+        <td class="col-divider">0.7</td>
+        <td class="col-divider"><b>64.91 (&plusmn;1.71)</b></td>
+        <td>84.00 (&plusmn;0.38)</td>
+        <td><b>84.24 (&plusmn;0.94)</b></td>
+        <td>82.83 (&plusmn;0.36)</td>
+        <td class="col-divider">80.90 (&plusmn;0.71)</td>
+        <td><b>85.11 (&plusmn;0.40)</b></td>
+        <td>85.08 (&plusmn;0.30)</td>
+        <td>83.27 (&plusmn;1.38)</td>
+        <td>84.88 (&plusmn;1.03)</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4" class="col-divider">LSTM-Names</td>
+        <td class="col-divider">0</td>
+        <td class="col-divider"><b>81.24 (&plusmn;0.25)</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td class="col-divider">-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.3</td>
+        <td class="col-divider">82.31 (&plusmn;0.81)</td>
+        <td>83.76 (&plusmn;0.58)</td>
+        <td>82.35 (&plusmn;0.27)</td>
+        <td>81.17 (&plusmn;0.31)</td>
+        <td class="col-divider">80.51 (&plusmn;0.59)</td>
+        <td>80.52 (&plusmn;0.36)</td>
+        <td>82.05 (&plusmn;0.40)</td>
+        <td>81.63 (&plusmn;0.08)</td>
+        <td>82.23 (&plusmn;0.83)</td>
+      </tr>
+      <tr>
+        <td class="col-divider">0.5</td>
+        <td class="col-divider">56.91 (&plusmn;1.42)</td>
+        <td>82.17 (&plusmn;0.64)</td>
+        <td>81.70 (&plusmn;0.78)</td>
+        <td>81.56 (&plusmn;0.45)</td>
+        <td class="col-divider">81.43 (&plusmn;0.95)</td>
+        <td>80.13 (&plusmn;0.52)</td>
+        <td>82.54 (&plusmn;1.03)</td>
+        <td>82.04 (&plusmn;1.21)</td>
+        <td>82.57 (&plusmn;0.06)</td>
+      </tr>
+      <tr style="border-bottom: 2px solid black">
+        <td class="col-divider">0.7</td>
+        <td class="col-divider"><b>47.65 (&plusmn;1.97)</b></td>
+        <td><b>81.56 (&plusmn;0.34)</b></td>
+        <td>80.87 (&plusmn;0.58)</td>
+        <td>81.07 (&plusmn;0.81)</td>
+        <td class="col-divider">66.68 (&plusmn;0.57)</td>
+        <td>79.35 (&plusmn;0.35)</td>
+        <td><b>81.15 (&plusmn;0.75)</b></td>
+        <td>80.40 (&plusmn;0.75)</td>
+        <td>46.59 (&plusmn;1.33)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="content">
+  <h2>Training Results</h2>
+  <figure>
+    <img class="summary-img" src="./static/images/full_training.svg" style="width:100%;">
+    <figcaption>
+      Test accuracy of the best run for SplitNN training with noise injection (NI) only and noise injection
+      (NI) plus denoising (i.e. masking or scaling) in different training tasks. All models are split with one FC layer
+      on the server side (\(\sigma\)): noise level, (\(p\)): masking ratio, (\(\lambda\)): scaling factor
+      (\(\frac{1}{\alpha}\)).
+    </figcaption>
+  </figure>
+</div>
+<div class="content">
+  <h2>Data Reconstruction</h2>
+  <figure>
+    <img class="summary-img" src="./static/images/attack_all_nips2024.png" style="width:100%;">
+    <figcaption>
+      Private training data reconstruction by FSHA attack in Split Learning on MNIST, CIFAR-10,
+      and ImageNet. In all cases, \(X_{priv}\) : the original training data, <em>i.e.</em> ground truth; \(X_{rec}\): FSHA on plain-text
+      SplitNN; \(X_{rec(N)}\): FSHA on SplitNN with noise injection (NI) (\(\sigma = 0.7\)); \(X_{rec(S)}\): FSHA on SplitNN with NI
+      and scaling (\(\sigma = 0.7, \lambda = 0.2\)); \(X_{rec(M)}\): FSHA on SplitNN with NI and masking (\(\sigma = 0.7, p = 0.2\)). Models
+      are split with one FC layer on the server side.
+    </figcaption>
+  </figure>
+</div>
+
+<div class="content">
+  <h2>BibTex</h2>
+  <code> @article{accuratesl,<br>
+  &nbsp;&nbsp;title={Accurate Split Learning on Noisy Signals},<br>
+  &nbsp;&nbsp;author={Xu, Hang and Maity, Subhajit and Dutta, Aritra and Li, Xin and Kalnis, Panos},<br>
+  &nbsp;&nbsp;journal={Transaction on Machine Learning Research},<br>
+  &nbsp;&nbsp;url={https://openreview.net/forum?id=in1T4BlzG9},<br>
+  &nbsp;&nbsp;issn={2835-8856},<br>
+  &nbsp;&nbsp;year={2026}<br>
+  } </code> 
+</div>
+<p style="text-align:center; font-family: Google Sans"> Copyright: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"> CC BY-NC-SA 4.0</a> © Subhajit Maity | Last updated: 31 Mar 2026 | Template Credit: <a href="https://dreambooth.github.io/"> DreamBooth</a></p>
+</body>
+</html>
